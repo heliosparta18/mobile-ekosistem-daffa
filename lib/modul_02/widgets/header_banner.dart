@@ -4,11 +4,15 @@ import 'package:flutter/material.dart';
 class HeaderBanner extends StatelessWidget {
   final String studentName;
   final String nim;
+  final int courseCount;
+  final int totalSks;
 
   const HeaderBanner({
     super.key,
-    this.studentName = 'Mahasiswa TRPL',
-    this.nim = '362355401xxx',
+    this.studentName = 'Muhammad Daffa Ariby Hidayat',
+    this.nim = '362558302081',
+    this.courseCount = 0,
+    this.totalSks = 0,
   });
 
   @override
@@ -37,23 +41,26 @@ class HeaderBanner extends StatelessWidget {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Container(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-                decoration: BoxDecoration(
-                  color: Colors.white.withValues(alpha: 0.2),
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                child: const Text(
-                  'Semester 5 (2026/2027)',
-                  style: TextStyle(
+              Flexible(
+                child: Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                  decoration: BoxDecoration(
+                    color: Colors.white.withValues(alpha: 0.2),
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: const Text(
+                    'Semester 5 (2026/2027)',
+                    overflow: TextOverflow.ellipsis,
+                    style: TextStyle(
                       color: Colors.white,
                       fontSize: 11,
-                      fontWeight: FontWeight.w600),
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
                 ),
               ),
-              const Icon(Icons.notifications_active_outlined,
-                  color: Colors.white, size: 20),
+              const SizedBox(width: 8),
+              const Icon(Icons.notifications_active_outlined, color: Colors.white, size: 20),
             ],
           ),
           const SizedBox(height: 14),
@@ -64,21 +71,21 @@ class HeaderBanner extends StatelessWidget {
           const SizedBox(height: 4),
           const Text(
             'Dashboard Akademik & Proyek',
-            style: TextStyle(
-                color: Colors.white, fontSize: 20, fontWeight: FontWeight.bold),
+            style: TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.bold),
           ),
           const SizedBox(height: 16),
-          // Ringkasan status akademik
-          // Ringkasan status akademik
-          const Wrap(
+
+          // Wrap mencegah overflow pada layar sempit atau font besar.
+          // Tantangan 3: badge total SKS ditampilkan di sini di sebelah nama.
+          Wrap(
             spacing: 8,
             runSpacing: 8,
             children: [
-              _StatPill(icon: Icons.task_alt, label: '4 Matakuliah'),
-              _StatPill(icon: Icons.grade, label: 'IPK 3.85'),
-              _StatPill(icon: Icons.calendar_month, label: '100% Hadir'),
+              _StatPill(icon: Icons.task_alt, label: '$courseCount Matakuliah'),
+              _StatPill(icon: Icons.co_present_rounded, label: '$totalSks SKS Diambil'),
+              const _StatPill(icon: Icons.grade, label: 'IPK 3.85'),
             ],
-          ), // Wrap
+          ),
         ],
       ),
     );
@@ -105,11 +112,10 @@ class _StatPill extends StatelessWidget {
         children: [
           Icon(icon, size: 14, color: Colors.white),
           const SizedBox(width: 4),
-          Text(label,
-              style: const TextStyle(
-                  color: Colors.white,
-                  fontSize: 11,
-                  fontWeight: FontWeight.w500)),
+          Text(
+            label,
+            style: const TextStyle(color: Colors.white, fontSize: 11, fontWeight: FontWeight.w500),
+          ),
         ],
       ),
     );

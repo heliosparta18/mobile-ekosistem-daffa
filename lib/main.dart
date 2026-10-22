@@ -3,9 +3,19 @@ import 'modul_01/profile_screen.dart';
 import 'modul_02/academic_dashboard_screen.dart';
 import 'modul_03/modul_03_app.dart';
 import 'modul_04/modul_04_app.dart';
+import 'modul_06/modul_06_app.dart';
+// ignore: unused_import
+import 'pengayaan/modul_06/modul_06_pengayaan_app.dart';
 
 void main() {
-  runApp(const PoliwangiStarterApp());
+  // Fase A — Fundamental (Wajib): Form login, validasi & sesi di memori RAM
+  runApp(const Modul06App());
+
+  // Fase B — Pengayaan (Advanced): Secure Storage, Gerbang Sesi & Papan Diagnostik
+  // Cukup ganti baris di atas dengan: runApp(const Modul06PengayaanApp());
+
+  // Menu Launcher Perkuliahan:
+  // runApp(const PoliwangiStarterApp());
 }
 
 class PoliwangiStarterApp extends StatelessWidget {
@@ -15,6 +25,7 @@ class PoliwangiStarterApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
+      home: const ModuleLauncherScreen(),
       title: 'Poliwangi Mobile Codelabs 2026',
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(
@@ -23,7 +34,6 @@ class PoliwangiStarterApp extends StatelessWidget {
         ),
         useMaterial3: true,
       ),
-      home: const ModuleLauncherScreen(),
     );
   }
 }
@@ -33,7 +43,7 @@ class ModuleLauncherScreen extends StatefulWidget {
 
   // Konfigurasi batas modul aktif perkuliahan (diatur oleh Dosen Pengampu)
   // Mahasiswa hanya dapat mengakses modul dengan nomor <= activeModuleUntil
-  static const int activeModuleUntil = 2; // Saat ini: Minggu ke-2 (Modul 1 & 2 terbuka)
+  static const int activeModuleUntil = 6; // Dibuka hingga Modul 06 (Login & Sesi)
 
   // Token akses kelas untuk membuka modul saat praktikum di lab
   static const Map<int, String> modulePasscodes = {
@@ -265,9 +275,9 @@ class _ModuleLauncherScreenState extends State<ModuleLauncherScreen> {
           const SizedBox(height: 10),
           _buildModuleCard(
             moduleNumber: 6,
-            title: 'Authentication, Security & FCM',
-            subtitle: 'JWT lifecycle, token refresh, dan push notification',
-            builder: () => const _PlaceholderScreen(moduleNumber: 6, title: 'Authentication, Security & FCM'),
+            title: 'Authentication & Session Dasar',
+            subtitle: 'Alur login, mesin keadaan, penanganan token & sesi memori',
+            builder: () => const Modul06App(),
           ),
           const SizedBox(height: 10),
           _buildModuleCard(

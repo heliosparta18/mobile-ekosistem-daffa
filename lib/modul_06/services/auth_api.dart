@@ -1,0 +1,105 @@
+import '../models/sesi_pengguna.dart';
+
+/// Kegagalan autentikasi yang aman ditampilkan ke pengguna.
+class AuthException implements Exception {
+  final String pesan;
+  final int kode;
+  const AuthException(this.pesan, {this.kode = 401});
+
+  @override
+  String toString() => 'AuthException($kode): $pesan';
+}
+
+/// API login tiruan: tidak menyentuh jaringan, hasilnya deterministik.
+class AuthApi {
+  // Kredensial demo ditulis terbuka karena memang dummy.
+  static const String emailDemo = 'student@trpl.test';
+  static const String sandiDemo = 'belajar123';
+  static const String emailTerkunci = 'terkunci@trpl.test';
+  static const String emailServerGangguan = 'gangguan@trpl.test';
+
+  // Latihan Mandiri 1: Kredensial kelima (akun belum diaktivasi)
+  static const String emailBelumAktif = 'belum_aktif@trpl.test';
+
+  /// Jeda buatan supaya keadaan "memproses" benar-benar terlihat.
+  final Duration tunda;
+  const AuthApi({this.tunda = const Duration(milliseconds: 700)});
+
+  Future<SesiPengguna> masuk({
+    required String email,
+    required String sandi,
+    Duration masaBerlaku = const Duration(hours: 2),
+  }) async {
+    await Future.delayed(tunda);
+
+    final String emailBersih = email.trim().toLowerCase();
+
+    if (emailBersih.isEmpty || sandi.isEmpty) {
+      throw const AuthException(
+        'Email dan kata sandi wajib diisi.',
+        kode: 400,
+      );
+    }
+
+    if (emailBersih == emailTerkunci) {
+      throw const AuthException(
+        'Akun terkunci sementara karena terlalu banyak percobaan. '
+        'Coba lagi beberapa menit lagi.',
+        kode: 423,
+      );
+    }
+
+    if (emailBersih == emailServerGangguan) {
+      throw const AuthException(
+        'Server sedang tidak dapat dihubungi. Periksa koneksi lalu coba lagi.',
+        kode: 503,
+      );
+    }
+
+    if (emailBersih == emailBelumAktif) {
+      throw const AuthException(
+        'Akun belum diaktivasi. Silakan periksa tautan aktivasi di email Anda.',
+        kode: 403,
+      );
+    }
+
+    if (emailBersih != emailDemo || sandi != sandiDemo) {
+      // Pesan ini SENGAJA tidak menyebut mana yang salah — menyebut
+      // "email tidak terdaftar" akan membocorkan daftar pengguna (user enumeration).
+      throw const AuthException('Email atau kata sandi salah.');
+    }
+
+    final DateTime mulai = DateTime.now();
+    return SesiPengguna(
+      // Token tiruan: bentuknya menyerupai token sungguhan, tetapi tidak
+      // dapat dipakai ke sistem mana pun di luar modul ini.
+      token: 'dummy.${mulai.millisecondsSinceEpoch}.trpl',
+      email: emailBersih,
+      nama: _namaUntuk(emailBersih),
+      peran: 'mahasiswa',
+      masukPada: mulai.toIso8601String(),
+      kedaluwarsaPada: mulai.add(masaBerlaku).toIso8601String(),
+    );
+  }
+
+  /// Memperbarui masa berlaku sesi — meniru "refresh token".
+  /// Dipakai Fase B; token tetap sama karena tidak ada server sungguhan.
+  Future<SesiPengguna> perbaruiSesi(
+    SesiPengguna sesi, {
+    Duration masaBerlaku = const Duration(hours: 2),
+  }) async {
+    await Future.delayed(tunda);
+    final DateTime mulai = DateTime.now();
+    return sesi.copyWith(
+      masukPada: mulai.toIso8601String(),
+      kedaluwarsaPada: mulai.add(masaBerlaku).toIso8601String(),
+    );
+  }
+
+  static String _namaUntuk(String email) {
+    if (email == emailDemo) return 'Mahasiswa TRPL';
+    final String depan = email.split('@').first;
+    if (depan.isEmpty) return 'Pengguna';
+    return '${depan[0].toUpperCase()}${depan.substring(1)}';
+  }
+}
